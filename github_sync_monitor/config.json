@@ -1,0 +1,54 @@
+{
+  "tasks": [
+    {
+      "id": "07012dd6-503f-4ca0-b009-f82fb0412c8d",
+      "name": "device-to-GitHub-auto",
+      "local_path": "C:/Users/dong/AppData/Local/Claude-3p/local-agent-mode-sessions/90bee1e7-e294-498a-bc28-6e6f87e64ccc/00000000-0000-4000-8000-000000000001/local_c9acf861-508f-4e89-bb14-72a71d6c674c/outputs",
+      "remote_url": "https://github.com/xqhlkh/device-to-GitHub-auto.git",
+      "branch": "main",
+      "commit_message": "自动同步",
+      "status": "error",
+      "last_sync": "2026-05-04 21:36:09",
+      "logs": [
+        "[20:52:31] 手动触发同步...",
+        "[20:52:31] 检测到文件变更，开始同步...",
+        "[20:52:34] 同步失败: git push 失败: remote: Repository not found.\nfatal: repository 'https://github.com/xqhlkh/device-to-GitHub-auto.gif/' not found",
+        "[20:53:16] 手动触发同步...",
+        "[20:53:16] 检测到文件变更，开始同步...",
+        "[20:53:19] 同步失败: git push 失败: remote: Repository not found.\nfatal: repository 'https://github.com/xqhlkh/device-to-GitHub-auto.gif/' not found",
+        "[20:53:44] 监控已启动",
+        "[20:53:47] 手动触发同步...",
+        "[20:53:47] 检测到文件变更，开始同步...",
+        "[20:54:18] 同步成功: 已推送本地积压提交（无新变更）",
+        "[21:33:07] 监控已启动",
+        "[21:36:05] 手动触发同步...",
+        "[21:36:05] 检测到文件变更，开始同步...",
+        "[21:36:09] 同步成功: 已推送本地积压提交（无新变更）",
+        "[21:36:44] 检测到文件变更，开始同步...",
+        "[21:36:44] 同步失败: 本地路径不存在: D:\\桌面文件\\github_sync_monitor",
+        "[21:43:24] 启动失败: 监控目录不存在: C:\\Users\\dong\\AppData\\Local\\Claude-3p\\local-agent-mode-sessions\\90bee1e7-e294-498a-bc28-6e6f87e64ccc\\00000000-0000-4000-8000-000000000001\\local_c9acf861-508f-4e89-bb14-72a71d6c674c\\outputs\\github_sync_monitor\\github_sync_monitor",
+        "[21:43:31] 手动触发同步...",
+        "[21:43:31] 检测到文件变更，开始同步...",
+        "[21:43:31] 同步失败: 本地路径不存在: C:\\Users\\dong\\AppData\\Local\\Claude-3p\\local-agent-mode-sessions\\90bee1e7-e294-498a-bc28-6e6f87e64ccc\\00000000-0000-4000-8000-000000000001\\local_c9acf861-508f-4e89-bb14-72a71d6c674c\\outputs\\github_sync_monitor\\github_sync_monitor"
+      ]
+    },
+    {
+      "id": "68d945a1-3bc2-4ec5-81e7-8463109403ca",
+      "name": "apple blog",
+      "local_path": "C:/Users/dong/AppData/Local/Claude-3p/local-agent-mode-sessions/90bee1e7-e294-498a-bc28-6e6f87e64ccc/00000000-0000-4000-8000-000000000001/local_b7be1d35-3ebc-4d1f-a60a-0d60fe503b66/outputs/apple-blog",
+      "remote_url": "https://github.com/xqhlkh/apple-blog.git",
+      "branch": "main",
+      "commit_message": "自动同步",
+      "status": "running",
+      "last_sync": "从未同步",
+      "logs": [
+        "[21:33:07] 监控已启动",
+        "[21:33:20] 监控已停止",
+        "[21:33:20] 监控已启动",
+        "[21:33:20] 监控已停止",
+        "[21:33:20] 监控已启动",
+        "[21:43:24] 监控已启动"
+      ]
+    }
+  ]
+}
