@@ -7,10 +7,9 @@
       "remote_url": "https://github.com/xqhlkh/device-to-GitHub-auto.git",
       "branch": "main",
       "commit_message": "自动同步",
-      "status": "error",
+      "status": "running",
       "last_sync": "2026-05-04 21:36:09",
       "logs": [
-        "[20:52:31] 手动触发同步...",
         "[20:52:31] 检测到文件变更，开始同步...",
         "[20:52:34] 同步失败: git push 失败: remote: Repository not found.\nfatal: repository 'https://github.com/xqhlkh/device-to-GitHub-auto.gif/' not found",
         "[20:53:16] 手动触发同步...",
@@ -29,7 +28,8 @@
         "[21:43:24] 启动失败: 监控目录不存在: C:\\Users\\dong\\AppData\\Local\\Claude-3p\\local-agent-mode-sessions\\90bee1e7-e294-498a-bc28-6e6f87e64ccc\\00000000-0000-4000-8000-000000000001\\local_c9acf861-508f-4e89-bb14-72a71d6c674c\\outputs\\github_sync_monitor\\github_sync_monitor",
         "[21:43:31] 手动触发同步...",
         "[21:43:31] 检测到文件变更，开始同步...",
-        "[21:43:31] 同步失败: 本地路径不存在: C:\\Users\\dong\\AppData\\Local\\Claude-3p\\local-agent-mode-sessions\\90bee1e7-e294-498a-bc28-6e6f87e64ccc\\00000000-0000-4000-8000-000000000001\\local_c9acf861-508f-4e89-bb14-72a71d6c674c\\outputs\\github_sync_monitor\\github_sync_monitor"
+        "[21:43:31] 同步失败: 本地路径不存在: C:\\Users\\dong\\AppData\\Local\\Claude-3p\\local-agent-mode-sessions\\90bee1e7-e294-498a-bc28-6e6f87e64ccc\\00000000-0000-4000-8000-000000000001\\local_c9acf861-508f-4e89-bb14-72a71d6c674c\\outputs\\github_sync_monitor\\github_sync_monitor",
+        "[21:58:11] 监控已启动"
       ]
     },
     {
@@ -47,8 +47,20 @@
         "[21:33:20] 监控已启动",
         "[21:33:20] 监控已停止",
         "[21:33:20] 监控已启动",
-        "[21:43:24] 监控已启动"
+        "[21:43:24] 监控已启动",
+        "[21:58:11] 监控已启动"
       ]
+    },
+    {
+      "id": "b9132f73-917f-4e57-84cc-757cdf08fc23",
+      "name": "mlzb chat",
+      "local_path": "C:/Users/dong/AppData/Local/Claude-3p/local-agent-mode-sessions/90bee1e7-e294-498a-bc28-6e6f87e64ccc/00000000-0000-4000-8000-000000000001/local_c9acf861-508f-4e89-bb14-72a71d6c674c/outputs/github_sync_monitor",
+      "remote_url": "https://github.com/xqhlkh/mlzb-chat.git",
+      "branch": "main",
+      "commit_message": "自动同步",
+      "status": "stopped",
+      "last_sync": "从未同步",
+      "logs": []
     }
   ]
 }
