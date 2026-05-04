@@ -135,29 +135,26 @@ def do_sync(local_path: str, remote_url: str, branch: str,
     _ensure_branch(abs_path, branch)
 
     # ============================================================
-    # Step 3: 检查是否有变更
+    # Step 3-5: 有变更才 add + commit；无变更仍然继续 push
     # ============================================================
-    if not has_changes(abs_path):
-        return SyncResult(True, "没有检测到文件变更，跳过同步")
+    committed = False
+    if has_changes(abs_path):
+        rc, stdout, stderr = _run_git(abs_path, "add", "-A")
+        if rc != 0:
+            return SyncResult(False, f"git add 失败: {stderr}")
 
-    # ============================================================
-    # Step 4: git add -A
-    # ============================================================
-    rc, stdout, stderr = _run_git(abs_path, "add", "-A")
-    if rc != 0:
-        return SyncResult(False, f"git add 失败: {stderr}")
-
-    # ============================================================
-    # Step 5: git commit
-    # ============================================================
-    ts = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    msg = f"{commit_message} ({ts})"
-    rc, stdout, stderr = _run_git(abs_path, "commit", "-m", msg)
-    if rc != 0:
-        combined = (stderr + " " + stdout).lower()
-        if "nothing to commit" in combined or "nothing added to commit" in combined:
-            return SyncResult(True, "没有需要提交的变更")
-        return SyncResult(False, f"git commit 失败: {stderr or stdout}")
+        ts = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        msg = f"{commit_message} ({ts})"
+        rc, stdout, stderr = _run_git(abs_path, "commit", "-m", msg)
+        if rc != 0:
+            combined = (stderr + " " + stdout).lower()
+            if "nothing to commit" in combined or "nothing added to commit" in combined:
+                # 没有新变更，继续尝试 push（可能之前有未推送的提交）
+                pass
+            else:
+                return SyncResult(False, f"git commit 失败: {stderr or stdout}")
+        else:
+            committed = True
 
     # ============================================================
     # Step 6: git pull --rebase（避免冲突）
@@ -167,18 +164,21 @@ def do_sync(local_path: str, remote_url: str, branch: str,
         logger.warning("git pull 失败（将继续 push）: %s", stderr or stdout)
 
     # ============================================================
-    # Step 7: git push
+    # Step 7: git push（无条件执行，推送所有本地提交）
     # ============================================================
     rc, stdout, stderr = _run_git(abs_path, "push", "-u", "origin", branch, timeout=120)
     if rc != 0:
         combined = (stderr + " " + stdout).lower()
-        # 如果 push 失败，尝试检查上游是否已存在该分支
         if "does not match any" in combined or "does not exist" in combined:
             _ensure_branch(abs_path, branch)
             rc2, _, stderr2 = _run_git(abs_path, "push", "-u", "origin", branch, timeout=120)
             if rc2 != 0:
-                return SyncResult(False, f"git push 失败（分支不存在）: {stderr2}")
-            return SyncResult(True, "同步成功")
-        return SyncResult(False, f"git push 失败: {stderr or stdout}")
+                return SyncResult(False, f"git push 失败: {stderr2}")
+        elif "everything up-to-date" in combined:
+            return SyncResult(True, "远程已是最新，无需推送")
+        else:
+            return SyncResult(False, f"git push 失败: {stderr or stdout}")
 
-    return SyncResult(True, "同步成功")
+    if committed:
+        return SyncResult(True, "同步成功")
+    return SyncResult(True, "已推送本地积压提交（无新变更）")
