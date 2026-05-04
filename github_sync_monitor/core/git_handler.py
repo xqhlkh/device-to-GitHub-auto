@@ -157,28 +157,64 @@ def do_sync(local_path: str, remote_url: str, branch: str,
             committed = True
 
     # ============================================================
-    # Step 6: git pull --rebase（避免冲突）
+    # Step 6: git pull --rebase（先拉取远端，避免 non-fast-forward）
     # ============================================================
-    rc, stdout, stderr = _run_git(abs_path, "pull", "--rebase", "origin", branch, timeout=120)
-    if rc != 0:
-        logger.warning("git pull 失败（将继续 push）: %s", stderr or stdout)
+    _do_pull_rebase(abs_path, branch)
 
     # ============================================================
-    # Step 7: git push（无条件执行，推送所有本地提交）
+    # Step 7: git push（带重试）
     # ============================================================
-    rc, stdout, stderr = _run_git(abs_path, "push", "-u", "origin", branch, timeout=120)
-    if rc != 0:
+    for attempt in range(2):
+        rc, stdout, stderr = _run_git(abs_path, "push", "-u", "origin", branch, timeout=120)
+        if rc == 0:
+            break
         combined = (stderr + " " + stdout).lower()
         if "does not match any" in combined or "does not exist" in combined:
             _ensure_branch(abs_path, branch)
-            rc2, _, stderr2 = _run_git(abs_path, "push", "-u", "origin", branch, timeout=120)
-            if rc2 != 0:
-                return SyncResult(False, f"git push 失败: {stderr2}")
+            continue
         elif "everything up-to-date" in combined:
-            return SyncResult(True, "远程已是最新，无需推送")
+            break
+        elif "non-fast-forward" in combined or "rejected" in combined or "behind" in combined:
+            # 远端有本地没有的提交，强制 rebase 后再推
+            logger.warning("远端有冲突提交，执行强制 rebase...")
+            _do_pull_rebase(abs_path, branch, force=True)
+            continue
         else:
             return SyncResult(False, f"git push 失败: {stderr or stdout}")
+    else:
+        # 两次重试都失败
+        return SyncResult(False, f"git push 失败: {stderr or stdout}")
 
     if committed:
         return SyncResult(True, "同步成功")
-    return SyncResult(True, "已推送本地积压提交（无新变更）")
+    return SyncResult(True, "已推送")
+
+
+def _do_pull_rebase(local_path: str, branch: str, force: bool = False):
+    """执行 git pull --rebase，失败时尝试更激进策略。"""
+    # 策略 1: 普通 pull --rebase
+    args = ["pull", "--rebase"]
+    if force:
+        args += ["-X", "theirs"]  # 冲突时以远端为准
+    rc, stdout, stderr = _run_git(local_path, *args, "origin", branch, timeout=120)
+    if rc == 0:
+        return
+
+    # 策略 2: fetch + rebase（允许无关历史）
+    logger.warning("pull 失败，尝试 fetch + rebase...")
+    rc, _, _ = _run_git(local_path, "fetch", "origin", branch, timeout=120)
+    if rc == 0:
+        rebase_args = ["rebase", f"origin/{branch}"]
+        if force:
+            rebase_args += ["-X", "theirs"]
+        rc2, _, err2 = _run_git(local_path, *rebase_args, timeout=120)
+        if rc2 == 0:
+            return
+        # rebase 失败则放弃 rebase，回到合并前的状态
+        _run_git(local_path, "rebase", "--abort")
+        logger.warning("rebase 也失败: %s", err2)
+
+    # 策略 3: 最后尝试 merge（以远端为准）
+    logger.warning("尝试 merge 策略...")
+    merge_args = ["merge", f"origin/{branch}", "-X", "theirs", "--allow-unrelated-histories"]
+    _run_git(local_path, *merge_args, timeout=120)
