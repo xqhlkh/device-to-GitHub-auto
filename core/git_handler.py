@@ -6,7 +6,6 @@ Git 操作模块 —— 封装 git add / commit / push 流程。
 import os
 import subprocess
 import logging
-import threading
 from datetime import datetime
 
 logger = logging.getLogger("GitHandler")
@@ -49,32 +48,40 @@ def is_git_repo(local_path: str) -> bool:
     return rc == 0
 
 
-def init_repo(local_path: str, remote_url: str) -> SyncResult:
-    """初始化 Git 仓库并设置远程地址。"""
-    steps = []
+def _current_branch(local_path: str) -> str:
+    """获取当前分支名。"""
+    rc, stdout, _ = _run_git(local_path, "rev-parse", "--abbrev-ref", "HEAD")
+    return stdout if rc == 0 else ""
 
+
+def _ensure_branch(local_path: str, branch: str):
+    """确保当前分支名是指定名称（不一致则重命名）。"""
+    cur = _current_branch(local_path)
+    if cur and cur != branch:
+        _run_git(local_path, "branch", "-M", branch)
+        logger.info("分支已从 %s 重命名为 %s", cur, branch)
+
+
+def init_repo(local_path: str, remote_url: str, branch: str) -> SyncResult:
+    """初始化 Git 仓库、设置远程地址、确保分支名正确。"""
     # git init
     rc, stdout, stderr = _run_git(local_path, "init")
     if rc != 0:
         return SyncResult(False, f"git init 失败: {stderr}")
-    steps.append("git init 成功")
 
     # 检查是否已有 remote
     rc, stdout, _ = _run_git(local_path, "remote", "get-url", "origin")
     if rc == 0:
-        # 已有 origin，更新 URL
-        rc, _, stderr = _run_git(local_path, "remote", "set-url", "origin", remote_url)
-        if rc != 0:
-            return SyncResult(False, f"更新远程地址失败: {stderr}")
-        steps.append("更新远程地址 origin")
+        _run_git(local_path, "remote", "set-url", "origin", remote_url)
     else:
-        # 添加 origin
         rc, _, stderr = _run_git(local_path, "remote", "add", "origin", remote_url)
         if rc != 0:
             return SyncResult(False, f"添加远程地址失败: {stderr}")
-        steps.append("添加远程地址 origin")
 
-    return SyncResult(True, "; ".join(steps))
+    # 强制设置分支名（git init 后可能叫 master 而不是 main）
+    _ensure_branch(local_path, branch)
+
+    return SyncResult(True, "仓库初始化完成")
 
 
 def has_changes(local_path: str) -> bool:
@@ -87,63 +94,91 @@ def do_sync(local_path: str, remote_url: str, branch: str,
             commit_message: str) -> SyncResult:
     """
     执行完整的同步流程：
-    1. 确认是 git 仓库（否则初始化）
-    2. git add -A
-    3. git commit
-    4. git pull --rebase（避免冲突）
-    5. git push
+    1. 确认是 git 仓库（否则初始化 + 首次提交）
+    2. 确保远程地址和分支名正确
+    3. git add -A
+    4. git commit
+    5. git pull --rebase
+    6. git push
     """
     abs_path = os.path.abspath(local_path)
 
     if not os.path.isdir(abs_path):
         return SyncResult(False, f"本地路径不存在: {abs_path}")
 
-    # ---- Step 1: 确保是 git 仓库 ----
+    # ============================================================
+    # Step 1: 确保是 git 仓库
+    # ============================================================
     if not is_git_repo(abs_path):
         logger.info("目录非 Git 仓库，执行初始化...")
-        result = init_repo(abs_path, remote_url)
+        result = init_repo(abs_path, remote_url, branch)
         if not result.success:
             return result
-        # 首次提交需要先创建一个初始提交
-        rc, _, _ = _run_git(abs_path, "add", "-A")
-        rc, _, stderr = _run_git(abs_path, "commit", "-m", "初始提交（由 GitHubSyncMonitor 自动创建）")
+        # 首次提交所有文件
+        _run_git(abs_path, "add", "-A")
+        rc, _, stderr = _run_git(abs_path, "commit", "-m",
+                                 "初始提交（由 GitHubSyncMonitor 自动创建）")
         # 允许 "nothing to commit" 的情况
+        _ensure_branch(abs_path, branch)
 
-    # ---- Step 2: 确保 remote origin 正确 ----
+    # ============================================================
+    # Step 2: 确保 remote origin 和分支名正确
+    # ============================================================
     rc, current_remote, _ = _run_git(abs_path, "remote", "get-url", "origin")
     if rc != 0:
-        return SyncResult(False, "仓库没有配置远程地址 origin")
-    if current_remote.strip() != remote_url.strip():
+        return SyncResult(False, "仓库没有配置远程地址 origin，请检查仓库状态")
+    if current_remote != remote_url:
         _run_git(abs_path, "remote", "set-url", "origin", remote_url)
-        logger.info("远程地址已更新为 %s", remote_url)
+        logger.info("远程地址已更新")
 
-    # ---- Step 3: 检查是否有变更 ----
+    # 确保本地分支名与配置一致
+    _ensure_branch(abs_path, branch)
+
+    # ============================================================
+    # Step 3: 检查是否有变更
+    # ============================================================
     if not has_changes(abs_path):
         return SyncResult(True, "没有检测到文件变更，跳过同步")
 
-    # ---- Step 4: git add -A ----
+    # ============================================================
+    # Step 4: git add -A
+    # ============================================================
     rc, stdout, stderr = _run_git(abs_path, "add", "-A")
     if rc != 0:
         return SyncResult(False, f"git add 失败: {stderr}")
 
-    # ---- Step 5: git commit ----
-    msg = f"{commit_message} ({datetime.now().strftime('%Y-%m-%d %H:%M:%S')})"
+    # ============================================================
+    # Step 5: git commit
+    # ============================================================
+    ts = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    msg = f"{commit_message} ({ts})"
     rc, stdout, stderr = _run_git(abs_path, "commit", "-m", msg)
     if rc != 0:
-        # "nothing to commit" 不算错误
-        if "nothing to commit" in stderr.lower() or "nothing to commit" in stdout.lower():
+        combined = (stderr + " " + stdout).lower()
+        if "nothing to commit" in combined or "nothing added to commit" in combined:
             return SyncResult(True, "没有需要提交的变更")
-        return SyncResult(False, f"git commit 失败: {stderr}")
+        return SyncResult(False, f"git commit 失败: {stderr or stdout}")
 
-    # ---- Step 6: git pull --rebase ----
+    # ============================================================
+    # Step 6: git pull --rebase（避免冲突）
+    # ============================================================
     rc, stdout, stderr = _run_git(abs_path, "pull", "--rebase", "origin", branch, timeout=120)
     if rc != 0:
-        # pull 失败不中断，尝试继续 push（可能是新仓库或无远端提交）
-        logger.warning("git pull 失败（将继续 push）: %s", stderr)
+        logger.warning("git pull 失败（将继续 push）: %s", stderr or stdout)
 
-    # ---- Step 7: git push ----
+    # ============================================================
+    # Step 7: git push
+    # ============================================================
     rc, stdout, stderr = _run_git(abs_path, "push", "-u", "origin", branch, timeout=120)
     if rc != 0:
-        return SyncResult(False, f"git push 失败: {stderr}")
+        combined = (stderr + " " + stdout).lower()
+        # 如果 push 失败，尝试检查上游是否已存在该分支
+        if "does not match any" in combined or "does not exist" in combined:
+            _ensure_branch(abs_path, branch)
+            rc2, _, stderr2 = _run_git(abs_path, "push", "-u", "origin", branch, timeout=120)
+            if rc2 != 0:
+                return SyncResult(False, f"git push 失败（分支不存在）: {stderr2}")
+            return SyncResult(True, "同步成功")
+        return SyncResult(False, f"git push 失败: {stderr or stdout}")
 
     return SyncResult(True, "同步成功")
