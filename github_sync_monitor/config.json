@@ -10,7 +10,6 @@
       "status": "running",
       "last_sync": "2026-05-04 21:36:09",
       "logs": [
-        "[20:52:34] 同步失败: git push 失败: remote: Repository not found.\nfatal: repository 'https://github.com/xqhlkh/device-to-GitHub-auto.gif/' not found",
         "[20:53:16] 手动触发同步...",
         "[20:53:16] 检测到文件变更，开始同步...",
         "[20:53:19] 同步失败: git push 失败: remote: Repository not found.\nfatal: repository 'https://github.com/xqhlkh/device-to-GitHub-auto.gif/' not found",
@@ -29,7 +28,8 @@
         "[21:43:31] 检测到文件变更，开始同步...",
         "[21:43:31] 同步失败: 本地路径不存在: C:\\Users\\dong\\AppData\\Local\\Claude-3p\\local-agent-mode-sessions\\90bee1e7-e294-498a-bc28-6e6f87e64ccc\\00000000-0000-4000-8000-000000000001\\local_c9acf861-508f-4e89-bb14-72a71d6c674c\\outputs\\github_sync_monitor\\github_sync_monitor",
         "[21:58:11] 监控已启动",
-        "[22:41:27] 监控已启动"
+        "[22:41:27] 监控已启动",
+        "[22:43:02] 监控已启动"
       ]
     },
     {
@@ -40,7 +40,7 @@
       "branch": "main",
       "commit_message": "自动同步",
       "status": "running",
-      "last_sync": "从未同步",
+      "last_sync": "2026-05-04 22:43:28",
       "logs": [
         "[21:33:07] 监控已启动",
         "[21:33:20] 监控已停止",
@@ -49,13 +49,19 @@
         "[21:33:20] 监控已启动",
         "[21:43:24] 监控已启动",
         "[21:58:11] 监控已启动",
-        "[22:41:27] 监控已启动"
+        "[22:41:27] 监控已启动",
+        "[22:43:02] 监控已启动",
+        "[22:43:11] 手动触发同步...",
+        "[22:43:11] 检测到文件变更，开始同步...",
+        "[22:43:20] 同步成功: 已推送",
+        "[22:43:20] 检测到文件变更，开始同步...",
+        "[22:43:28] 同步成功: 已推送"
       ]
     },
     {
       "id": "b9132f73-917f-4e57-84cc-757cdf08fc23",
       "name": "mlzb chat",
-      "local_path": "C:/Users/dong/AppData/Local/Claude-3p/local-agent-mode-sessions/90bee1e7-e294-498a-bc28-6e6f87e64ccc/00000000-0000-4000-8000-000000000001/local_c9acf861-508f-4e89-bb14-72a71d6c674c/outputs/github_sync_monitor",
+      "local_path": "C:/Users/dong/AppData/Local/Claude-3p/local-agent-mode-sessions/90bee1e7-e294-498a-bc28-6e6f87e64ccc/00000000-0000-4000-8000-000000000001/local_db60b3e6-adca-4ac2-adaa-2261e32abeff/outputs/ai-chat",
       "remote_url": "https://github.com/xqhlkh/mlzb-chat.git",
       "branch": "main",
       "commit_message": "自动同步",
@@ -65,7 +71,8 @@
         "[22:41:27] 监控已启动",
         "[22:41:32] 手动触发同步...",
         "[22:41:32] 检测到文件变更，开始同步...",
-        "[22:41:38] 同步成功: 已推送"
+        "[22:41:38] 同步成功: 已推送",
+        "[22:43:02] 监控已启动"
       ]
     }
   ]
