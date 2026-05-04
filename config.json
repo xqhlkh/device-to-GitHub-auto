@@ -10,9 +10,6 @@
       "status": "error",
       "last_sync": "2026-05-04 20:43:22",
       "logs": [
-        "[20:42:34] 手动触发同步...",
-        "[20:42:34] 检测到文件变更，开始同步...",
-        "[20:42:35] 同步成功: 没有检测到文件变更，跳过同步",
         "[20:42:35] 监控已停止",
         "[20:42:35] 监控已启动",
         "[20:42:41] 手动触发同步...",
@@ -29,7 +26,10 @@
         "[20:52:29] 监控已启动",
         "[20:52:31] 手动触发同步...",
         "[20:52:31] 检测到文件变更，开始同步...",
-        "[20:52:34] 同步失败: git push 失败: remote: Repository not found.\nfatal: repository 'https://github.com/xqhlkh/device-to-GitHub-auto.gif/' not found"
+        "[20:52:34] 同步失败: git push 失败: remote: Repository not found.\nfatal: repository 'https://github.com/xqhlkh/device-to-GitHub-auto.gif/' not found",
+        "[20:53:16] 手动触发同步...",
+        "[20:53:16] 检测到文件变更，开始同步...",
+        "[20:53:19] 同步失败: git push 失败: remote: Repository not found.\nfatal: repository 'https://github.com/xqhlkh/device-to-GitHub-auto.gif/' not found"
       ]
     }
   ]
