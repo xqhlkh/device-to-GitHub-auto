@@ -34,7 +34,7 @@ def _run_git(cwd: str, *args, timeout: int = 60) -> tuple[int, str, str]:
             timeout=timeout,
             creationflags=subprocess.CREATE_NO_WINDOW if os.name == "nt" else 0,
         )
-        return proc.returncode, proc.stdout.strip(), proc.stderr.strip()
+        return proc.returncode, (proc.stdout or "").strip(), (proc.stderr or "").strip()
     except subprocess.TimeoutExpired:
         return -1, "", "Git 命令执行超时"
     except FileNotFoundError:
