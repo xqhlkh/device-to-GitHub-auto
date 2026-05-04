@@ -83,6 +83,15 @@ class TaskWorker:
         self._add_log("监控已停止")
         self._on_status_change(self.config["id"], "stopped")
 
+    def trigger_sync(self):
+        """手动触发立即同步（跳过防抖）。"""
+        self._add_log("手动触发同步...")
+        # 取消防抖定时器，立刻执行
+        if self._debounce_timer:
+            self._debounce_timer.cancel()
+            self._debounce_timer = None
+        self._do_sync()
+
     # ── 内部方法 ──────────────────────────────────────────
 
     def _add_log(self, message: str):
@@ -284,6 +293,18 @@ class TaskManager:
         """停止所有任务。"""
         for task_id in list(self._workers.keys()):
             self.stop_task(task_id)
+
+    def sync_now(self, task_id: str):
+        """手动触发指定任务的立即同步。"""
+        worker = self._workers.get(task_id)
+        if worker:
+            worker.trigger_sync()
+        else:
+            # 如果任务未运行，先启动再同步
+            self.start_task(task_id)
+            worker = self._workers.get(task_id)
+            if worker:
+                worker.trigger_sync()
 
     def shutdown(self):
         """程序退出时调用 —— 停止所有监控。"""
