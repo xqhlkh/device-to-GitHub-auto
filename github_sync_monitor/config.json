@@ -7,10 +7,9 @@
       "remote_url": "https://github.com/xqhlkh/device-to-GitHub-auto.git",
       "branch": "main",
       "commit_message": "自动同步",
-      "status": "error",
+      "status": "running",
       "last_sync": "2026-05-04 21:36:09",
       "logs": [
-        "[20:53:44] 监控已启动",
         "[20:53:47] 手动触发同步...",
         "[20:53:47] 检测到文件变更，开始同步...",
         "[20:54:18] 同步成功: 已推送本地积压提交（无新变更）",
@@ -29,7 +28,8 @@
         "[22:43:02] 监控已启动",
         "[22:47:39] 监控已启动",
         "[22:51:58] 检测到文件变更，开始同步...",
-        "[22:53:22] 同步失败: git push 失败: fatal: unable to access 'https://github.com/xqhlkh/device-to-GitHub-auto.git/': Failed to connect to github.com port 443 after 21079 ms: Could not connect to server"
+        "[22:53:22] 同步失败: git push 失败: fatal: unable to access 'https://github.com/xqhlkh/device-to-GitHub-auto.git/': Failed to connect to github.com port 443 after 21079 ms: Could not connect to server",
+        "[10:08:06] 监控已启动"
       ]
     },
     {
@@ -39,7 +39,7 @@
       "remote_url": "https://github.com/xqhlkh/apple-blog.git",
       "branch": "main",
       "commit_message": "自动同步",
-      "status": "error",
+      "status": "running",
       "last_sync": "2026-05-04 22:43:28",
       "logs": [
         "[21:33:07] 监控已启动",
@@ -59,14 +59,15 @@
         "[22:47:39] 监控已启动",
         "[22:47:43] 手动触发同步...",
         "[22:47:43] 检测到文件变更，开始同步...",
-        "[22:48:47] 同步失败: git push 失败: fatal: unable to access 'https://github.com/xqhlkh/apple-blog.git/': Failed to connect to github.com port 443 after 21125 ms: Could not connect to server"
+        "[22:48:47] 同步失败: git push 失败: fatal: unable to access 'https://github.com/xqhlkh/apple-blog.git/': Failed to connect to github.com port 443 after 21125 ms: Could not connect to server",
+        "[10:08:06] 监控已启动"
       ]
     },
     {
       "id": "b9132f73-917f-4e57-84cc-757cdf08fc23",
       "name": "mlzb chat",
       "local_path": "C:/Users/dong/AppData/Local/Claude-3p/local-agent-mode-sessions/90bee1e7-e294-498a-bc28-6e6f87e64ccc/00000000-0000-4000-8000-000000000001/local_db60b3e6-adca-4ac2-adaa-2261e32abeff/outputs/ai-chat",
-      "remote_url": "git@github.com/xqhlkh/mlzb-chat.git",
+      "remote_url": "https://github.com/xqhlkh/mlzb-chat.git",
       "branch": "main",
       "commit_message": "自动同步",
       "status": "error",
@@ -86,7 +87,11 @@
         "[22:50:35] 同步失败: git push 失败: fatal: unable to access 'https://github.com/xqhlkh/mlzb-chat.git/': Failed to connect to github.com port 443 after 21085 ms: Could not connect to server",
         "[22:51:57] 手动触发同步...",
         "[22:51:57] 检测到文件变更，开始同步...",
-        "[22:53:17] 同步失败: git push 失败: fatal: unable to access 'https://github.com/xqhlkh/mlzb-chat.git/': Failed to connect to github.com port 443 after 21071 ms: Could not connect to server"
+        "[22:53:17] 同步失败: git push 失败: fatal: unable to access 'https://github.com/xqhlkh/mlzb-chat.git/': Failed to connect to github.com port 443 after 21071 ms: Could not connect to server",
+        "[10:08:06] 监控已启动",
+        "[10:08:09] 手动触发同步...",
+        "[10:08:09] 检测到文件变更，开始同步...",
+        "[10:08:10] 同步失败: git push 失败: fatal: 'git@github.com/xqhlkh/mlzb-chat.git' does not appear to be a git repository\nfatal: Could not read from remote repository.\n\nPlease make sure you have the correct access rights\nand the repository exists."
       ]
     }
   ]
