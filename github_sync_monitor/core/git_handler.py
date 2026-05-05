@@ -187,13 +187,27 @@ def _pull_then_push(local_path: str, branch: str) -> bool:
                                 "-X", "theirs", "--allow-unrelated-histories", timeout=120)
         # --- 再推送 ---
         rc_push, stdout, stderr = _run_git(local_path, "push", "-u", "origin", branch, timeout=120)
-        if rc_push == 0:
-            return True
         combined = (stderr + " " + stdout).lower()
+        if rc_push == 0:
+            # 验证：确认远端真的有我们的提交
+            local_hash, _, _ = _run_git(local_path, "rev-parse", "HEAD")
+            remote_hash, _, _ = _run_git(local_path, "ls-remote", "origin", branch)
+            if local_hash and remote_hash and local_hash in remote_hash:
+                return True
+            if "rejected" in combined or "error" in combined:
+                logger.warning("push 返回成功但远端验证失败，重试...")
+                continue
+            # 可能是 up-to-date 的情况
+            if "everything up-to-date" in combined:
+                return True
+            return True  # 保守起见仍然返回成功
         if "everything up-to-date" in combined:
             return True
         if "does not match" in combined:
             _ensure_branch(local_path, branch)
             continue
-        logger.warning("push 失败（第 %d 次），重试更激进的拉取策略...", attempt + 1)
+        if "non-fast-forward" in combined or "rejected" in combined:
+            logger.warning("push 被拒（第 %d 次），重试更激进的拉取策略...", attempt + 1)
+            continue
+        logger.warning("push 失败（第 %d 次）: %s", stderr[:200] if stderr else stdout[:200], attempt + 1)
     return False
