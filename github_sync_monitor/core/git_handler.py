@@ -157,64 +157,43 @@ def do_sync(local_path: str, remote_url: str, branch: str,
             committed = True
 
     # ============================================================
-    # Step 6: git pull --rebase（先拉取远端，避免 non-fast-forward）
+    # Step 6-7: pull + push
     # ============================================================
-    _do_pull_rebase(abs_path, branch)
-
-    # ============================================================
-    # Step 7: git push（带重试）
-    # ============================================================
-    for attempt in range(2):
-        rc, stdout, stderr = _run_git(abs_path, "push", "-u", "origin", branch, timeout=120)
-        if rc == 0:
-            break
-        combined = (stderr + " " + stdout).lower()
-        if "does not match any" in combined or "does not exist" in combined:
-            _ensure_branch(abs_path, branch)
-            continue
-        elif "everything up-to-date" in combined:
-            break
-        elif "non-fast-forward" in combined or "rejected" in combined or "behind" in combined:
-            # 远端有本地没有的提交，强制 rebase 后再推
-            logger.warning("远端有冲突提交，执行强制 rebase...")
-            _do_pull_rebase(abs_path, branch, force=True)
-            continue
-        else:
-            return SyncResult(False, f"git push 失败: {stderr or stdout}")
-    else:
-        # 两次重试都失败
-        return SyncResult(False, f"git push 失败: {stderr or stdout}")
+    if not _pull_then_push(abs_path, branch):
+        return SyncResult(False, "同步失败：无法拉取远端或推送本地提交，请手动解决冲突")
 
     if committed:
         return SyncResult(True, "同步成功")
     return SyncResult(True, "已推送")
 
 
-def _do_pull_rebase(local_path: str, branch: str, force: bool = False):
-    """执行 git pull --rebase，失败时尝试更激进策略。"""
-    # 策略 1: 普通 pull --rebase
-    args = ["pull", "--rebase"]
-    if force:
-        args += ["-X", "theirs"]  # 冲突时以远端为准
-    rc, stdout, stderr = _run_git(local_path, *args, "origin", branch, timeout=120)
-    if rc == 0:
-        return
-
-    # 策略 2: fetch + rebase（允许无关历史）
-    logger.warning("pull 失败，尝试 fetch + rebase...")
-    rc, _, _ = _run_git(local_path, "fetch", "origin", branch, timeout=120)
-    if rc == 0:
-        rebase_args = ["rebase", f"origin/{branch}"]
-        if force:
-            rebase_args += ["-X", "theirs"]
-        rc2, _, err2 = _run_git(local_path, *rebase_args, timeout=120)
-        if rc2 == 0:
-            return
-        # rebase 失败则放弃 rebase，回到合并前的状态
-        _run_git(local_path, "rebase", "--abort")
-        logger.warning("rebase 也失败: %s", err2)
-
-    # 策略 3: 最后尝试 merge（以远端为准）
-    logger.warning("尝试 merge 策略...")
-    merge_args = ["merge", f"origin/{branch}", "-X", "theirs", "--allow-unrelated-histories"]
-    _run_git(local_path, *merge_args, timeout=120)
+def _pull_then_push(local_path: str, branch: str) -> bool:
+    """拉取远端并推送，支持自动重试。返回 True 表示成功。"""
+    for attempt in range(3):
+        # --- 先拉取 ---
+        if attempt == 0:
+            # 第一次：正常 pull --rebase
+            rc, _, _ = _run_git(local_path, "pull", "--rebase", "origin", branch, timeout=120)
+        elif attempt == 1:
+            # 第二次：fetch + rebase（远端优先）
+            _run_git(local_path, "fetch", "origin", branch, timeout=120)
+            rc, _, _ = _run_git(local_path, "rebase", f"origin/{branch}", timeout=120)
+            if rc != 0:
+                _run_git(local_path, "rebase", "--abort")
+        else:
+            # 第三次：fetch + merge（远端覆盖冲突）
+            _run_git(local_path, "fetch", "origin", branch, timeout=120)
+            rc, _, _ = _run_git(local_path, "merge", f"origin/{branch}",
+                                "-X", "theirs", "--allow-unrelated-histories", timeout=120)
+        # --- 再推送 ---
+        rc_push, stdout, stderr = _run_git(local_path, "push", "-u", "origin", branch, timeout=120)
+        if rc_push == 0:
+            return True
+        combined = (stderr + " " + stdout).lower()
+        if "everything up-to-date" in combined:
+            return True
+        if "does not match" in combined:
+            _ensure_branch(local_path, branch)
+            continue
+        logger.warning("push 失败（第 %d 次），重试更激进的拉取策略...", attempt + 1)
+    return False
