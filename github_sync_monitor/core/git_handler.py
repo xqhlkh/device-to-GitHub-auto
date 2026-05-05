@@ -183,47 +183,45 @@ def do_sync(local_path: str, remote_url: str, branch: str,
     return SyncResult(True, " | ".join(detail_parts))
 
 
-def _pull_then_push(local_path: str, branch: str) -> bool:
-    """拉取远端并推送，支持自动重试。返回 True 表示成功。"""
+def _pull_then_push(local_path: str, branch: str) -> tuple[bool, str]:
+    """拉取远端并推送，支持自动重试。返回 (成功?, 详情)。"""
     for attempt in range(3):
         # --- 先拉取 ---
+        detail = ""
         if attempt == 0:
-            # 第一次：正常 pull --rebase
             rc, _, _ = _run_git(local_path, "pull", "--rebase", "origin", branch, timeout=120)
+            detail = "pull-rebase"
         elif attempt == 1:
-            # 第二次：fetch + rebase（远端优先）
             _run_git(local_path, "fetch", "origin", branch, timeout=120)
             rc, _, _ = _run_git(local_path, "rebase", f"origin/{branch}", timeout=120)
             if rc != 0:
                 _run_git(local_path, "rebase", "--abort")
+            detail = "fetch+rebase"
         else:
-            # 第三次：fetch + merge（远端覆盖冲突）
             _run_git(local_path, "fetch", "origin", branch, timeout=120)
             rc, _, _ = _run_git(local_path, "merge", f"origin/{branch}",
                                 "-X", "theirs", "--allow-unrelated-histories", timeout=120)
+            detail = "fetch+merge"
         # --- 再推送 ---
         rc_push, stdout, stderr = _run_git(local_path, "push", "-u", "origin", branch, timeout=120)
         combined = (stderr + " " + stdout).lower()
         if rc_push == 0:
-            # 验证：确认远端真的有我们的提交
+            # 验证远端
             local_hash, _, _ = _run_git(local_path, "rev-parse", "HEAD")
             remote_hash, _, _ = _run_git(local_path, "ls-remote", "origin", branch)
             if local_hash and remote_hash and local_hash in remote_hash:
-                return True
-            if "rejected" in combined or "error" in combined:
-                logger.warning("push 返回成功但远端验证失败，重试...")
-                continue
-            # 可能是 up-to-date 的情况
+                return True, f"push成功({detail})"
             if "everything up-to-date" in combined:
-                return True
-            return True  # 保守起见仍然返回成功
+                return True, f"无变化({detail})"
+            if "rejected" in combined or "error" in combined:
+                logger.warning("push rc=0但远端不匹配，重试...")
+                continue
+            return True, f"push({detail})"
         if "everything up-to-date" in combined:
-            return True
+            return True, f"up-to-date({detail})"
         if "does not match" in combined:
             _ensure_branch(local_path, branch)
             continue
-        if "non-fast-forward" in combined or "rejected" in combined:
-            logger.warning("push 被拒（第 %d 次），重试更激进的拉取策略...", attempt + 1)
-            continue
-        logger.warning("push 失败（第 %d 次）: %s", stderr[:200] if stderr else stdout[:200], attempt + 1)
-    return False
+        detail += f" 拒绝:{stderr[:60]}" if stderr else ""
+        logger.warning("push/%d 失败: %s", attempt + 1, stderr[:120] if stderr else "")
+    return False, "3次重试均失败"
