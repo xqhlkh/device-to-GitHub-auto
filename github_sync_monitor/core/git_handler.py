@@ -135,8 +135,9 @@ def do_sync(local_path: str, remote_url: str, branch: str,
     _ensure_branch(abs_path, branch)
 
     # ============================================================
-    # Step 3-5: 有变更才 add + commit；无变更仍然继续 push
+    # Step 3-5: 有变更才 add + commit
     # ============================================================
+    detail_parts = []
     committed = False
     if has_changes(abs_path):
         rc, stdout, stderr = _run_git(abs_path, "add", "-A")
@@ -149,22 +150,37 @@ def do_sync(local_path: str, remote_url: str, branch: str,
         if rc != 0:
             combined = (stderr + " " + stdout).lower()
             if "nothing to commit" in combined or "nothing added to commit" in combined:
-                # 没有新变更，继续尝试 push（可能之前有未推送的提交）
-                pass
+                detail_parts.append("没有新文件变更")
             else:
                 return SyncResult(False, f"git commit 失败: {stderr or stdout}")
         else:
             committed = True
+            detail_parts.append(f"已提交: {stdout[:80]}" if stdout else "已提交本地")
+    else:
+        detail_parts.append("无文件变更")
 
     # ============================================================
     # Step 6-7: pull + push
     # ============================================================
-    if not _pull_then_push(abs_path, branch):
-        return SyncResult(False, "同步失败：无法拉取远端或推送本地提交，请手动解决冲突")
+    # 记录 push 前的状态
+    local_pre, _, _ = _run_git(abs_path, "rev-parse", "--short", "HEAD")
+    detail_parts.append(f"本地: {local_pre[:8] if local_pre else '?'}")
 
-    if committed:
-        return SyncResult(True, "同步成功")
-    return SyncResult(True, "已推送")
+    pushed, push_detail = _pull_then_push(abs_path, branch)
+    detail_parts.append(push_detail)
+
+    if not pushed:
+        detail_parts.append("推送失败！")
+        return SyncResult(False, " | ".join(detail_parts))
+
+    # 记录 push 后的远端状态
+    remote_after, _, _ = _run_git(abs_path, "ls-remote", "origin", branch)
+    if remote_after:
+        remote_hash = remote_after.split()[0] if remote_after.split() else "?"
+        detail_parts.append(f"远端: {remote_hash[:8]}")
+    detail_parts.append("推送成功" if committed else "远端已最新")
+
+    return SyncResult(True, " | ".join(detail_parts))
 
 
 def _pull_then_push(local_path: str, branch: str) -> bool:
