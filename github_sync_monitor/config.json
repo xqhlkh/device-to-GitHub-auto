@@ -10,7 +10,6 @@
       "status": "running",
       "last_sync": "2026-05-05 10:56:22",
       "logs": [
-        "[21:58:11] 监控已启动",
         "[22:41:27] 监控已启动",
         "[22:43:02] 监控已启动",
         "[22:47:39] 监控已启动",
@@ -29,25 +28,20 @@
         "[10:55:29] 检测到文件变更，开始同步...",
         "[10:55:38] 同步成功: 无文件变更 | 本地: ? | 无变化(pull-rebase) | 远端已最新",
         "[10:56:13] 检测到文件变更，开始同步...",
-        "[10:56:22] 同步成功: 已提交本地 | 本地: ? | push(pull-rebase) | 推送成功"
+        "[10:56:22] 同步成功: 已提交本地 | 本地: ? | push(pull-rebase) | 推送成功",
+        "[11:13:51] 监控已启动"
       ]
     },
     {
       "id": "68d945a1-3bc2-4ec5-81e7-8463109403ca",
       "name": "apple blog",
-      "local_path": "C:/Users/dong/AppData/Local/Claude-3p/local-agent-mode-sessions/90bee1e7-e294-498a-bc28-6e6f87e64ccc/00000000-0000-4000-8000-000000000001/local_b7be1d35-3ebc-4d1f-a60a-0d60fe503b66/outputs/apple-blog",
+      "local_path": "D:/claude/blog",
       "remote_url": "https://github.com/xqhlkh/apple-blog.git",
       "branch": "main",
       "commit_message": "自动同步",
       "status": "running",
-      "last_sync": "2026-05-05 10:53:14",
+      "last_sync": "2026-05-10 11:17:34",
       "logs": [
-        "[21:33:20] 监控已启动",
-        "[21:43:24] 监控已启动",
-        "[21:58:11] 监控已启动",
-        "[22:41:27] 监控已启动",
-        "[22:43:02] 监控已启动",
-        "[22:43:11] 手动触发同步...",
         "[22:43:11] 检测到文件变更，开始同步...",
         "[22:43:20] 同步成功: 已推送",
         "[22:43:20] 检测到文件变更，开始同步...",
@@ -61,7 +55,13 @@
         "[10:50:16] 监控已启动",
         "[10:53:03] 手动触发同步...",
         "[10:53:03] 检测到文件变更，开始同步...",
-        "[10:53:14] 同步成功: 无文件变更 | 本地: ? | 无变化(pull-rebase) | 远端已最新"
+        "[10:53:14] 同步成功: 无文件变更 | 本地: ? | 无变化(pull-rebase) | 远端已最新",
+        "[11:13:51] 监控已启动",
+        "[11:13:59] 手动触发同步...",
+        "[11:13:59] 检测到文件变更，开始同步...",
+        "[11:14:12] 同步成功: 无文件变更 | 本地: ? | 无变化(pull-rebase) | 远端已最新",
+        "[11:17:24] 检测到文件变更，开始同步...",
+        "[11:17:34] 同步成功: 无文件变更 | 本地: ? | 无变化(pull-rebase) | 远端已最新"
       ]
     },
     {
@@ -72,15 +72,8 @@
       "branch": "main",
       "commit_message": "自动同步",
       "status": "running",
-      "last_sync": "2026-05-05 10:50:35",
+      "last_sync": "2026-05-10 11:20:25",
       "logs": [
-        "[22:49:31] 检测到文件变更，开始同步...",
-        "[22:50:35] 同步失败: git push 失败: fatal: unable to access 'https://github.com/xqhlkh/mlzb-chat.git/': Failed to connect to github.com port 443 after 21085 ms: Could not connect to server",
-        "[22:51:57] 手动触发同步...",
-        "[22:51:57] 检测到文件变更，开始同步...",
-        "[22:53:17] 同步失败: git push 失败: fatal: unable to access 'https://github.com/xqhlkh/mlzb-chat.git/': Failed to connect to github.com port 443 after 21071 ms: Could not connect to server",
-        "[10:08:06] 监控已启动",
-        "[10:08:09] 手动触发同步...",
         "[10:08:09] 检测到文件变更，开始同步...",
         "[10:08:10] 同步失败: git push 失败: fatal: 'git@github.com/xqhlkh/mlzb-chat.git' does not appear to be a git repository\nfatal: Could not read from remote repository.\n\nPlease make sure you have the correct access rights\nand the repository exists.",
         "[10:17:40] 监控已启动",
@@ -93,7 +86,14 @@
         "[10:50:35] 同步成功: 无文件变更 | 本地: ? | 无变化(pull-rebase) | 远端已最新",
         "[10:56:17] 手动触发同步...",
         "[10:56:17] 检测到文件变更，开始同步...",
-        "[10:56:25] 同步成功: 无文件变更 | 本地: ? | 无变化(pull-rebase) | 远端已最新"
+        "[10:56:25] 同步成功: 无文件变更 | 本地: ? | 无变化(pull-rebase) | 远端已最新",
+        "[11:13:51] 监控已启动",
+        "[11:17:46] 检测到文件变更，开始同步...",
+        "[11:17:55] 同步成功: 无文件变更 | 本地: ? | 无变化(pull-rebase) | 远端已最新",
+        "[11:18:48] 检测到文件变更，开始同步...",
+        "[11:18:58] 同步成功: 无文件变更 | 本地: ? | 无变化(pull-rebase) | 远端已最新",
+        "[11:20:18] 检测到文件变更，开始同步...",
+        "[11:20:25] 同步成功: 已提交本地 | 本地: ? | push(pull-rebase) | 推送成功"
       ]
     }
   ]
