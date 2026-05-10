@@ -89,7 +89,8 @@ class TaskDialog(QDialog):
         layout.addWidget(buttons)
 
     def _browse_folder(self):
-        folder = QFileDialog.getExistingDirectory(self, "选择要监控的文件夹")
+        start_dir = self.path_edit.text().strip() or ""
+        folder = QFileDialog.getExistingDirectory(self, "选择要监控的文件夹", start_dir)
         if folder:
             self.path_edit.setText(folder)
 
