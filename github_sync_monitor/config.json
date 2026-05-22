@@ -10,7 +10,6 @@
       "status": "running",
       "last_sync": "2026-05-10 11:34:04",
       "logs": [
-        "[10:50:16] 监控已启动",
         "[10:50:19] 手动触发同步...",
         "[10:50:19] 检测到文件变更，开始同步...",
         "[10:50:27] 同步成功: 已提交本地 | 本地: ? | push(pull-rebase) | 推送成功",
@@ -29,7 +28,8 @@
         "[11:34:04] 同步成功: 已提交本地 | 本地: ? | push(pull-rebase) | 推送成功",
         "[11:35:22] 监控已启动",
         "[11:37:02] 检测到文件变更，开始同步...",
-        "[11:37:26] 上一次同步仍在进行，跳过"
+        "[11:37:26] 上一次同步仍在进行，跳过",
+        "[21:08:41] 监控已启动"
       ]
     },
     {
@@ -42,7 +42,6 @@
       "status": "running",
       "last_sync": "2026-05-10 11:25:22",
       "logs": [
-        "[22:48:47] 同步失败: git push 失败: fatal: unable to access 'https://github.com/xqhlkh/apple-blog.git/': Failed to connect to github.com port 443 after 21125 ms: Could not connect to server",
         "[10:08:06] 监控已启动",
         "[10:17:40] 监控已启动",
         "[10:50:16] 监控已启动",
@@ -61,7 +60,8 @@
         "[11:25:20] 上一次同步仍在进行，跳过",
         "[11:25:22] 同步成功: 已提交本地 | 本地: ? | push(pull-rebase) | 推送成功",
         "[11:33:33] 监控已启动",
-        "[11:35:22] 监控已启动"
+        "[11:35:22] 监控已启动",
+        "[21:08:41] 监控已启动"
       ]
     },
     {
@@ -76,8 +76,20 @@
       "logs": [
         "[11:37:23] 监控已启动",
         "[11:37:27] 手动触发同步...",
-        "[11:37:27] 检测到文件变更，开始同步..."
+        "[11:37:27] 检测到文件变更，开始同步...",
+        "[21:08:41] 监控已启动"
       ]
+    },
+    {
+      "id": "f2f72b64-be6b-471f-9d48-9d8bcf2876f1",
+      "name": "模拟stock",
+      "local_path": "C:/Users/dong/AppData/Local/Claude-3p/local-agent-mode-sessions/90bee1e7-e294-498a-bc28-6e6f87e64ccc/00000000-0000-4000-8000-000000000001/local_6155c169-35b9-49ce-9d98-42c112c1164d/outputs/stock-sim",
+      "remote_url": "https://github.com/xqhlkh/stock-simulation.git",
+      "branch": "main",
+      "commit_message": "自动同步",
+      "status": "stopped",
+      "last_sync": "从未同步",
+      "logs": []
     }
   ]
 }
